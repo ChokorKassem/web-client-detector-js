@@ -1,0 +1,24 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log
+package-lock.json
+.pnpm-debug.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# runtime/state
+config.json
+
+# logs
+logs/
+*.log
