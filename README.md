@@ -1,4 +1,4 @@
-# Web Client Detector — README
+# Web Client Detector (JavaScript)
 
 ## What this bot is?
 
