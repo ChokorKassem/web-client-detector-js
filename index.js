@@ -706,6 +706,96 @@ client.on('messageCreate', async (message) => {
       await removeSusRoleFromMember(mention, message.author, 'Manual unsus via prefix command');
       return message.reply(`Removed Sus role (if present) from <@${mention.id}>. Logged to <#${getLogChannelId()}>.`);
     }
+
+    // === prefix scan ===
+    if (cmd === 'scan') {
+      if (!isAdmin) return message.reply('Only configured admin roles may run this command.');
+
+      // parse: !scan @user OR !scan USER_ID OR !scan [duration] [apply]
+      if (args.length > 0) {
+        // check member mention or id
+        const m = args[0].match(/^<@!?(\d{17,20})>$|^(\d{17,20})$/);
+        if (m) {
+          const id = m[1] || m[2];
+          const member = await message.guild.members.fetch(id).catch(()=>null);
+          if (!member) return message.reply('Member not found.');
+          const rows = await performScan(message.guild, { member });
+          const row = rows[0];
+          const platformList = row.platforms.length ? row.platforms.join(', ') : 'offline/no-presence';
+          const embed = new EmbedBuilder().setTitle(`Scan result for ${row.tag}`).addFields(
+            { name: 'Platforms', value: platformList, inline: true },
+            { name: 'Joined at', value: row.joinedAt || 'unknown', inline: true },
+            { name: 'User ID', value: row.userId, inline: false }
+          ).setTimestamp();
+          const restrictBtn = new ButtonBuilder().setCustomId(`scan_restrict_${row.userId}`).setLabel('Mark Sus').setStyle(ButtonStyle.Danger);
+          const ignoreBtn = new ButtonBuilder().setCustomId(`scan_ignore_${row.userId}`).setLabel('Ignore').setStyle(ButtonStyle.Secondary);
+          const actionRow = new ActionRowBuilder().addComponents(restrictBtn, ignoreBtn);
+          const sent = await message.reply({ embeds: [embed], components: [actionRow] });
+
+          const filter = i => i.user.id === message.author.id && i.channelId === message.channel.id;
+          const collector = message.channel.createMessageComponentCollector({ filter, time: 120000, max: 1 });
+          collector.on('collect', async i => {
+            if (i.customId === `scan_restrict_${row.userId}`) {
+              await addSusRoleToMember(member, 'Marked via scan command');
+              await safeInteractionReply(i, { content: `Marked <@${member.id}> as Sus and logged to <#${getLogChannelId()}>.`, ephemeral: true });
+            } else {
+              await safeInteractionReply(i, { content: 'No action taken.', ephemeral: true });
+            }
+          });
+          return;
+        }
+      }
+
+      // Bulk scan branch (no member specified)
+      const knownDurations = ['last_hour','last_day','last_week','last_month'];
+      const durationArg = args.find(a => knownDurations.includes(a));
+      const applySus = args.includes('apply') || args.includes('apply_sus');
+
+      await message.reply('Starting bulk scan. This may take time. Results will be posted to the log channel.');
+      const rows = await performScan(message.guild, { duration: durationArg });
+      if (!rows || rows.length === 0) return message.reply('No members found for the given criteria.');
+
+      if (rows.length <= 300) {
+        const header = 'user | server nickname | id | mention | platform(s)';
+        const body = rows.map(r => formatBulkRow(r)).join('\n');
+        await logToChannel(message.guild, `Bulk scan completed (${rows.length} members):\n${header}\n${body}`);
+      } else {
+        const csvPath = await createCsvForScan(rows);
+        await logToChannel(message.guild, `Bulk scan completed: ${rows.length} members — CSV attached. (Columns: userId,tag,displayName,platforms,joinedAt)`, { csvPath });
+        setTimeout(() => fs.remove(csvPath).catch(()=>{}), 60 * 1000);
+      }
+
+      if (applySus) {
+        const suspects = rows.filter(r => {
+          if (!r.platforms || r.platforms.length === 0) return false;
+          if (Array.isArray(r.platforms)) return r.platforms.length === 1 && r.platforms[0] === 'web';
+          return r.platforms === 'web';
+        });
+        const mb = new EmbedBuilder().setTitle('Apply Sus to matched users?').setDescription(`Found ${suspects.length} matched users. To apply Sus, run the same command with 'apply' and confirm in the UI.`).setTimestamp();
+        await logToChannel(message.guild, `Bulk scan found ${suspects.length} suspects. To apply Sus via prefix, run: !scan apply. (Or use slash command for an interactive confirm)`);
+      }
+
+      return;
+    }
+
+    // === prefix setupverify ===
+    if (cmd === 'setupverify') {
+      if (!isAdmin) return message.reply('Only configured admin roles may run this command.');
+      await message.reply('Opening interactive setup in the verify channel...');
+      await startInteractiveSetup(message, message.member);
+      return;
+    }
+
+    // === prefix autoscan ===
+    if (cmd === 'autoscan') {
+      if (!isAdmin) return message.reply('Only configured admin roles may run this command.');
+      const action = args[0] ? args[0].toLowerCase() : null;
+      if (!action || (action !== 'on' && action !== 'off')) return message.reply('Usage: !autoscan on|off');
+      config.autoscanEnabled = (action === 'on');
+      await saveConfig(config);
+      return message.reply(`Auto-scan is now ${config.autoscanEnabled ? 'ENABLED' : 'DISABLED'}.`);
+    }
+
   } catch (e) { console.error('prefix handler error', e); }
 });
 
