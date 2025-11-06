@@ -47,10 +47,10 @@ This bot automatically isolates users who look suspicious (e.g. web-only clients
 
 ## Files & where to put them?
 
-* `index.js` — main bot (drop-in).
-* `register-commands.js` — registers guild slash commands.
-* `package.json` — dependencies & scripts.
-* `.env` (create from `.env.example`) — your secrets and IDs.
+* [index.js](./index.js) — main bot (drop-in).
+* [register-commands.js](./register-commands.js) — registers guild slash commands.
+* [package.json](./package.json) — dependencies & scripts.
+* `.env` (create from [.env.example](./.env.example)) — your secrets and IDs.
 * `config.json` — created automatically on first run (stores runtime settings).
 
 ---
