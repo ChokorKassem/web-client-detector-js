@@ -1,4 +1,4 @@
-# CHECKLIST — First manual run‑through (exact clicks)
+# CHECKLIST — First manual run‑through
 
 This is a short, exact list of what to *click* during your first manual test. Follow steps in order.
 
@@ -18,7 +18,7 @@ This is a short, exact list of what to *click* during your first manual test. Fo
 
 ---
 
-## 3) Interactive setup (admin) — exactly what to click
+## 3) Interactive setup (admin)
 1. In the verify channel, **type** or trigger the slash command: `/setupverify` → **press Enter**.
 2. A short ephemeral reply appears; the bot will open an interactive setup message in the same verify channel. In that message:
    - **Click** the select menu labeled `Select verification methods` to open it.
@@ -42,7 +42,7 @@ This is a short, exact list of what to *click* during your first manual test. Fo
 
 ---
 
-## 5) Mark a member sus (admin test) — exact clicks
+## 5) Mark a member sus (admin test)
 1. In any text channel (or the verify channel), **type** the slash command: `/scan member:@User` and press **Enter** (choose a test user from the picker).
 2. The bot replies with a scan embed and two buttons: **Mark sus** (red) and **Ignore** (grey).
 3. **Click** the **Mark sus** button.
@@ -50,13 +50,13 @@ This is a short, exact list of what to *click* during your first manual test. Fo
 
 ---
 
-## 6) Manual verify (admin) — exact clicks
+## 6) Manual verify (admin)
 1. As admin, run the slash command `/verifyuser member:@User` → press **Enter**.
 2. The bot replies ephemeral: sus removed and a log entry is written.
 
 ---
 
-## 7) Change log channel (admin) — exact clicks
+## 7) Change log channel (admin)
 1. Run slash command `/setlog channel:#logs` (use the channel picker) → press **Enter**.
 2. The bot replies ephemeral confirming the log channel is set.
 
