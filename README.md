@@ -1,6 +1,6 @@
 # Web Client Detector — README
 
-## What this bot is (short intro)
+## What this bot is?
 
 This bot automatically isolates users who look suspicious (e.g. web-only clients) into a small verification area, forces them to verify **inside** a configured `#get-verified` channel (never by DM), and logs everything. Admins can scan members, export CSVs for large scans, manually verify/unsuspend users, change verification methods (button / typed word / math), and set the log channel. The bot is built for safe, paced role operations and robust error handling.
 
@@ -20,7 +20,7 @@ This bot automatically isolates users who look suspicious (e.g. web-only clients
 
 ---
 
-## Required Discord Developer Portal settings (exact)
+## Required Discord Developer Portal settings
 
 1. Create your bot in the Developer Portal and copy the **Bot Token**, **Client ID** and **Guild ID** (server).
 2. Under the bot's **Privileged Gateway Intents**, enable:
@@ -45,7 +45,7 @@ This bot automatically isolates users who look suspicious (e.g. web-only clients
 
 ---
 
-## Files & where to put them
+## Files & where to put them?
 
 * `index.js` — main bot (drop-in).
 * `register-commands.js` — registers guild slash commands.
